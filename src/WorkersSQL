@@ -1,0 +1,111 @@
+1. Tworzy tabelę pracownik(imie, nazwisko, wyplata, data urodzenia, stanowisko). W tabeli mogą być dodatkowe kolumny, które uznasz za niezbędne.
+
+CREATE Table pracownik (
+id INT auto_increment primary key,
+imie VARCHAR(50),
+nazwisko varchar(50),
+wypłata INT,
+data_urodzenia DATE,
+stanowisko VARCHAR(50)
+);
+
+2. Wstawia do tabeli co najmniej 6 pracowników
+
+INSERT INTO pracownik(imie, nazwisko, wypłata, data_urodzenia, stanowisko)
+values
+('Jan', 'Kowalski', 1800, '1990-5-24', 'dyrektor'), ('Adam', 'Kowalski', 4500, '1992-5-24', 'zastepca dyrektora'), ('Mateusz', 'Nowak', 2200, '1983-2-14', 'sprzedawca'),
+('Michał', 'Nowaczek', 1300, '1978-1-10', 'sprzedawca'), ('Lukasz', 'Abacki', 1800, '2000-11-12', 'sprzatacz'), ('Anna', 'Kowalczyk', 3000, '1960-5-24', 'ksiegowy');
+
+3. Pobiera wszystkich pracowników i wyświetla ich w kolejności alfabetycznej po nazwisku
+
+select * from pracownik ORDER BY nazwisko;
+
+4. Pobiera pracowników na wybranym stanowisku
+
+select * from pracownik
+WHERE stanowisko = 'dyrektor';
+
+5. Pobiera pracowników, którzy mają co najmniej 30 lat
+
+select * from pracownik
+WHERE EXTRACT(year from NOW()) - EXTRACT(year from data_urodzenia)  > 30 ;
+
+
+6. Zwiększa wypłatę pracowników na wybranym stanowisku o 10%
+
+update pracownik
+set wypłata = wypłata * 1.1
+where stanowisko = 'dyrektor';
+
+7. Usuwa najmłodszego pracownika
+
+delete  from pracownik
+WHERE data_urodzenia IN (
+Select  MIN(data_urodzenia) as a from (
+select distinct data_urodzenia pracownik)
+as b);
+
+8. Usuwa tabelę pracownik
+
+DROP TABLE pracownik;
+
+9. Tworzy tabelę stanowisko (nazwa stanowiska, opis, wypłata na danym stanowisku)
+
+CREATE Table stanowisko (
+id INT auto_increment primary key,
+nazwa_stanowiska VARCHAR(50),
+opis varchar(500),
+wypłata INT
+);
+
+10. Tworzy tabelę adres (ulica+numer domu/mieszkania, kod pocztowy, miejscowość)
+
+CREATE Table adres (
+id INT auto_increment primary key,
+ulica_nr_domu_lub_mieszkania VARCHAR(50),
+kod_pocztowy INT,
+miejscowosc varchar(30)
+);
+
+11. Tworzy tabelę pracownik (imię, nazwisko) + relacje do tabeli stanowisko i adres
+
+CREATE Table pracownik (
+id INT auto_increment primary key,
+imie VARCHAR(50),
+nazwisko varchar(50),
+adres_id INT,
+stanowisko_id INT
+);
+
+12. Dodaje dane testowe (w taki sposób, aby powstały pomiędzy nimi sensowne powiązania)
+
+INSERT INTO pracownik(imie, nazwisko, adres_id, stanowisko_id)
+values
+('Jan', 'Kowalski', 1, 1), ('Adam', 'Nowak', 2, 2), ('Anna', 'Abacka', 3, 2), ('Andrzej', 'Kowal', 4, 1);
+
+INSERT INTO adres(ulica_nr_domu_lub_mieszkania, kod_pocztowy, miejscowosc)
+values
+('Wroclawska, 12/32', 22123, 'Wrocław'), ('Warszawska, 33/1', 22123, 'Wrocław'), ('Polna, 33/5', 11123, 'Wrocław'), ('Główna, 1/1', 11222, 'Opole');
+
+INSERT INTO stanowisko(nazwa_stanowiska, opis, wypłata)
+values
+('Pracownik', 'pracuje w firmie', 3500), ('Szef', 'zarządza firmą', 6000);
+
+
+13. Pobiera pełne informacje o pracowniku (imię, nazwisko, adres, stanowisko)
+
+SELECT * FROM pracownik p
+JOIN adres a ON p.adres_id = a.id
+JOIN stanowisko s ON p.stanowisko_id = s.id;
+
+14. Oblicza sumę wypłat dla wszystkich pracowników w firmie
+
+SELECT SUM(wypłata) FROM pracownik p
+JOIN stanowisko s ON p.stanowisko_id = s.id
+
+
+15. Pobiera pracowników mieszkających w lokalizacji z kodem pocztowym 90210 (albo innym, który będzie miał sens dla Twoich danych testowych)
+
+SELECT * FROM pracownik p
+JOIN adres a ON p.adres_id = a.id
+WHERE a.kod_pocztowy = 22123;
